@@ -180,7 +180,7 @@ class ModelTrainer:
                 self.logger.log_data(
                     self._LOG_GROUP_NAME,
                     {
-                        "iteration": self._train_iteration,
+                        "train_iteration": self._train_iteration,
                         "epoch": epoch,
                         "train_dataset_size": dataset_train.num_stored,
                         "val_dataset_size": dataset_val.num_stored
@@ -208,13 +208,17 @@ class ModelTrainer:
 
         # saving the best models:
         if evaluate:
-            self._maybe_set_best_weights_and_elite(best_weights, best_val_score)
+            self._maybe_set_best_weights_and_elite(
+                best_weights, best_val_score
+            )
 
         self._train_iteration += 1
         return training_losses, val_scores
 
     def evaluate(
-        self, dataset: TransitionIterator, batch_callback: Optional[Callable] = None
+        self,
+        dataset: TransitionIterator,
+        batch_callback: Optional[Callable] = None,
     ) -> torch.Tensor:
         """Evaluates the model on the validation dataset.
 
