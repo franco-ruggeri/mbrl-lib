@@ -11,7 +11,11 @@ class CartPoleEnv(gym.Env):
     # This is a continuous version of gym's cartpole environment, with the only difference
     # being valid actions are any numbers in the range [-1, 1], and the are applied as
     # a multiplicative factor to the total force.
-    metadata = {"render.modes": ["human", "rgb_array"], "video.frames_per_second": [50]}
+    metadata = {
+        "render.modes": ["human", "rgb_array"],
+        "video.frames_per_second": [50],
+        "render_fps": 50,
+    }
 
     def __init__(self, render_mode: Optional[str] = None):
         self.gravity = 9.8
@@ -70,9 +74,12 @@ class CartPoleEnv(gym.Env):
             force + self.polemass_length * theta_dot**2 * sintheta
         ) / self.total_mass
         thetaacc = (self.gravity * sintheta - costheta * temp) / (
-            self.length * (4.0 / 3.0 - self.masspole * costheta**2 / self.total_mass)
+            self.length
+            * (4.0 / 3.0 - self.masspole * costheta**2 / self.total_mass)
         )
-        xacc = temp - self.polemass_length * thetaacc * costheta / self.total_mass
+        xacc = (
+            temp - self.polemass_length * thetaacc * costheta / self.total_mass
+        )
 
         if self.kinematics_integrator == "euler":
             x = x + self.tau * x_dot
@@ -149,7 +156,9 @@ class CartPoleEnv(gym.Env):
                     (self.screen_width, self.screen_height)
                 )
             else:  # mode == "rgb_array"
-                self.screen = pygame.Surface((self.screen_width, self.screen_height))
+                self.screen = pygame.Surface(
+                    (self.screen_width, self.screen_height)
+                )
         if self.clock is None:
             self.clock = pygame.time.Clock()
 
@@ -168,7 +177,12 @@ class CartPoleEnv(gym.Env):
         self.surf = pygame.Surface((self.screen_width, self.screen_height))
         self.surf.fill((255, 255, 255))
 
-        l, r, t, b = -cartwidth / 2, cartwidth / 2, cartheight / 2, -cartheight / 2
+        l, r, t, b = (
+            -cartwidth / 2,
+            cartwidth / 2,
+            cartheight / 2,
+            -cartheight / 2,
+        )
         axleoffset = cartheight / 4.0
         cartx = x[0] * scale + self.screen_width / 2.0  # MIDDLE OF CART
         carty = 100  # TOP OF CART
@@ -218,7 +232,8 @@ class CartPoleEnv(gym.Env):
 
         elif self.render_mode == "rgb_array":
             return np.transpose(
-                np.array(pygame.surfarray.pixels3d(self.screen)), axes=(1, 0, 2)
+                np.array(pygame.surfarray.pixels3d(self.screen)),
+                axes=(1, 0, 2),
             )
 
     def close(self):
